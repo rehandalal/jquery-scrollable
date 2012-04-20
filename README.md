@@ -9,12 +9,12 @@ Dependencies
 ------------
 
 - jQuery 1.7.2
-- jQuery UI (Draggable)
+- jQuery UI (For draggables)
 
 Usage
 -----
 
-First, load jQuery, jQuery UI, and the plugin:
+First, load jQuery, jQuery UI and the plugin:
 
     <script type="text/javascript" src="jquery-1.7.2.min.js" />
     <script type="text/javascript" src="jquery-ui-1.8.18.min.js" />
@@ -34,7 +34,7 @@ Additionally you may pass options through to this function:
         $(document).ready(function(){
             $('#scrollable-div').scrollable({
                 margin: 6,
-                showalways: true
+                show_track: true
             });
         });
     </script>

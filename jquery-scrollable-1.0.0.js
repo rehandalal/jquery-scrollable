@@ -13,47 +13,33 @@
         'create': function(options) {
             var defaults = {
                 align: 'right',
+                fade: true,
                 margin: 0,
-                railclass: 'scrollable_rail',
-                railwidth: 8,
-                riderclass: 'scrollable_rider',
-                showalways: false,
-                showrail: false,
-                wheelstep: 32,
-                wrapperclass: 'scrollable_wrapper'
+                mousewheel: true,
+                mousewheel_step: 32,
+                show_track: false,
+                thumb_class: 'scrollable_thumb',
+                track_class: 'scrollable_track',
+                track_width: 8,
+                wrapper_class: 'scrollable_wrapper'
             };
             
             var data = $.extend(defaults, options);
             
             return this.each(function(){
                 var $this = $(this);
-                
+                                
                 // Check if this is an existing scrollable and if so destroy
-                if ($this.data('scrollable')) {
-                    $this.scrollable('destroy');
-                    
-                    // Clear the added CSS and remove the parent
-                    $this.css({
-                        height: '', 
-                        position: '', 
-                        overflow: ''
-                    });
-
-                    var clone = $this.clone();
-
-                    $this.parent().after(clone);
-                    $this.parent().remove();
-                    $this = clone;
-                }
+                $this.scrollable('destroy');
 
                 $this.data('scrollable', data);
 
                 var containerHeight = $this.height();
-                var railHeight = containerHeight - (2 * data.margin);
+                var trackHeight = containerHeight - (2 * data.margin);
                 
                 // Wrap the existing content
                 var wrapper = $('<div></div>')
-                    .addClass(data.wrapperclass)
+                    .addClass(data.wrapper_class)
                     .css({
                         height: containerHeight,
                         overflow: 'hidden',
@@ -64,77 +50,77 @@
                 $this.wrap(wrapper);
                 var container = $this.parent();
                 
-                // Create the rail and rider
-                var rail = $('<div></div>')
-                    .addClass(data.railclass)
+                // Create the track and thumb
+                var track = $('<div></div>')
+                    .addClass(data.track_class)
                     .css({
                         bottom: data.margin + 'px',
-                        display: (data.showalways && data.showrail)?'block':'none',
+                        display: (!data.fade && data.show_track)?'block':'none',
                         left: (data.align == 'left')?data.margin + 'px':'auto',
                         position: 'absolute',
                         right: (data.align == 'right')?data.margin + 'px':'auto',
                         top: data.margin + 'px',
-                        width: data.railwidth + 'px',
+                        width: data.track_width + 'px',
                         zIndex: 1000
                     });
                     
-                var rider = $('<div></div>')
-                    .addClass(data.riderclass)
+                var thumb = $('<div></div>')
+                    .addClass(data.thumb_class)
                     .css({
-                        display: (data.showalways)?'block':'none',
+                        display: (data.fade)?'none':'block',
                         left: (data.align == 'left')?data.margin + 'px':'auto',
                         position: 'absolute',
                         right: (data.align == 'right')?data.margin + 'px':'auto',
                         top: data.margin + 'px',
-                        width: data.railwidth + 'px',
+                        width: data.track_width + 'px',
                         zIndex: 2000
                     });
                     
-                // Store the rail and rider
-                data.rail = rail;
-                data.rider = rider;
+                // Store the track and thumb
+                data.track = track;
+                data.thumb = thumb;
                     
                 $this.scrollable('refresh');
                     
-                // Create the invisible rail used for containment on the draggable
-                var contrail = rail.clone()
-                    .removeClass(data.railclass)
+                // Create the invisible track used for containment on the draggable
+                var container_track = track.clone()
                     .css({
                         display: 'block',
+                        visibility: 'hidden',
                         zIndex: 0
                     });
                 
-                // Insert the rail and rider
-                container.append(contrail)
-                    .append(rail)
-                    .append(rider);
+                // Insert the track and thumb
+                container.append(container_track)
+                    .append(track)
+                    .append(thumb);
                 
-                // Make the rider draggable and handle drag events
-                rider.draggable({
+                // Make the thumb draggable and handle drag events
+                thumb.draggable({
                     axis: 'y',
-                    containment: contrail,
+                    containment: container_track,
                     start: function(){
                         $(this).data('dragging', true);
                     },
                     stop: function(){
                         $(this).data('dragging', false);
-                        if (container.data('hovering') !== true) hide();
+                        if ((container.data('hovering') !== true) && (data.fade === true)) hide();
                     },
                     drag: function(){
                         // Calculate the Y offset required for scrolling to
-                        var y = (($(this).position().top - data.margin) / (railHeight - rider.height())) * (data.scrollableHeight - containerHeight);
+                        var y = (($(this).position().top - data.margin) / (trackHeight - thumb.height())) * (data.scrollableHeight - containerHeight);
                         $this.scrollTop(y);
                     }
                 });
                 
                 // Handle hover events if necessary
-                if (data.showalways !== true) {
+                if (data.fade === true) {
                     container.hover(function(){
                         container.data('hovering', true);
                         show();
                     }, function(){
                         container.data('hovering', false);
-                        if (rider.data('dragging') !== true) hide();
+                        if (thumb.data('dragging') !== true) hide();
                     });
                 }
                 
@@ -144,40 +130,54 @@
                 
                 // Hide the scrollbar
                 function hide() {
-                    if (data.showrail) rail.fadeOut(500);
-                    rider.fadeOut(500);
+                    if (data.show_track) track.fadeOut(500);
+                    thumb.fadeOut(500);
                 }
                 
                 // Function to scroll onMouseWheel
                 function onMouseWheel(event) {
                     var e = event.originalEvent;
-                    var delta = (e.wheelDelta)?e.wheelDelta:e.detail;
+                    var delta = (e.wheelDelta)?-e.wheelDelta:e.detail;
                     delta = delta / Math.abs(delta);
                     
-                    var y = $this.scrollTop() + (delta * data.wheelstep);
+                    var y = $this.scrollTop() + (delta * data.mousewheel_step);
                     $this.scrollTop(y);
                     
-                    rider.css({
-                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (railHeight - rider.height()))) + 'px' 
+                    thumb.css({
+                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (trackHeight - thumb.height()))) + 'px' 
                     });
+                    
+                    // Ensure that the page is not being scrolled
+                    return false;
                 }
                 
                 // Show the scrollbar
                 function show() {
-                    if (data.showrail) rail.fadeIn(150);
-                    rider.fadeIn(150);
+                    if (data.show_track) track.fadeIn(150);
+                    thumb.fadeIn(150);
                 }
             });
         },
         'destroy': function() {
             return this.each(function(){
                 var $this = $(this);
+                
+                if ($this.data('scrollable') !== undefined) {
+                    // Unbind all events
+                    $(window).unbind('.scrollable');
 
-                // Unbind all events
-                $(window).unbind('.scrollable');
+                    // Remove data
+                    $this.removeData('scrollable');
 
-                // Remove data
-                $this.removeData('scrollable');
+                    // Clear the added CSS and remove the parent
+                    $this.css({
+                        height: '', 
+                        position: '', 
+                        overflow: ''
+                    });
+
+                    $this.unwrap();
+                }
             });
         },
         'refresh': function() {
@@ -185,39 +185,41 @@
                 var $this = $(this);
                 var data = $this.data('scrollable');
                 
-                var containerHeight = $this.parent().height();
-                
-                var top = $this.scrollTop();
-                
-                // Set the overflow to visible to get the correct scrollable height
-                $this.css({
-                    height: 'auto',
-                    overflow: 'visible'
-                })
+                if (data !== undefined) {
+                    var containerHeight = $this.parent().height();
 
-                // Store the scrollable height
-                data.scrollableHeight = $this.height();
-                
-                // Restore the overflow to hidden
-                $this.css({
-                    height: containerHeight,
-                    overflow: 'hidden'
-                });
-                
-                // Reset the scroll top
-                $this.scrollTop(top);
-                
-                // Fix the rider height
-                var riderHeight = containerHeight * containerHeight / data.scrollableHeight;
-                if (riderHeight < 16) riderHeight = 16;
-                data.rider.css({
-                    height: riderHeight + 'px'
-                });
-                
-                // Reposition the rider
-                data.rider.css({
-                    top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (data.rail.height() - data.rider.height()))) + 'px' 
-                });
+                    var top = $this.scrollTop();
+
+                    // Set the overflow to visible to get the correct scrollable height
+                    $this.css({
+                        height: 'auto',
+                        overflow: 'visible'
+                    })
+
+                    // Store the scrollable height
+                    data.scrollableHeight = $this.height();
+
+                    // Restore the overflow to hidden
+                    $this.css({
+                        height: containerHeight,
+                        overflow: 'hidden'
+                    });
+
+                    // Reset the scroll top
+                    $this.scrollTop(top);
+
+                    // Fix the thumb height
+                    var thumbHeight = containerHeight * containerHeight / data.scrollableHeight;
+                    if (thumbHeight < 16) thumbHeight = 16;
+                    data.thumb.css({
+                        height: thumbHeight + 'px'
+                    });
+
+                    // Reposition the thumb
+                    data.thumb.css({
+                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (data.track.height() - data.thumb.height()))) + 'px' 
+                    });
+                }
             });
         }
     };
