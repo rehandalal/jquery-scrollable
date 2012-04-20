@@ -1,0 +1,57 @@
+body {
+    color: #333;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+    color: #09f;
+}
+
+code {
+    background: #eee;
+    border: 1px dashed #ccc;
+    padding: 10px;
+}
+
+.scrollable_wrapper, .scrollable {
+    border-bottom: 1px solid #aaa;
+    border-top: 1px solid #aaa;
+}
+
+.scrollable_wrapper .scrollable {
+    border: none;
+}
+
+.scrollable {
+    height: 200px;
+    list-style: none;
+    margin: 0;
+    overflow: auto;
+    padding: 0;
+    width: 300px;
+}
+
+.scrollable li {
+    background: #ddd;
+    padding: 10px;
+}
+
+.scrollable li + li {
+    border-top: 1px solid #aaa;
+}
+
+.scrollable_rail {
+    background: #000;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    opacity: 0.2;
+}
+
+.scrollable_rider {
+    background: #000;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    opacity: 0.4;
+}
