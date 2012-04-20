@@ -113,7 +113,7 @@
                     }
                 });
                 
-                // Handle hover events if necessary
+                // Handle hover
                 if (data.fade === true) {
                     container.hover(function(){
                         container.data('hovering', true);
@@ -125,8 +125,10 @@
                 }
                 
                 // Handle mousewheel
-                container.on("DOMMouseScroll", onMouseWheel);
-                container.on("mousewheel", onMouseWheel);
+                if (data.mousewheel === true) {
+                    container.on("DOMMouseScroll", onMouseWheel);
+                    container.on("mousewheel", onMouseWheel);
+                }
                 
                 // Hide the scrollbar
                 function hide() {

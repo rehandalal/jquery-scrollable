@@ -39,4 +39,4 @@ Additionally you may pass options through to this function:
         });
     </script>
 
-For more usage and examples see: examples.html
+For more usage and examples see: index.html
