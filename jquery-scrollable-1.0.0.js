@@ -8,10 +8,13 @@
 // Copyright (c) 2012, Rehan Dalal
 // Licensed under the Unlicense (http://unlicense.org/)
 //
-(function($){
+(function ($) {
+    "use strict";
     var methods = {
-        'create': function(options) {
-            var defaults = {
+        'create': function (options) {
+            var defaults, data;
+
+            defaults = {
                 align: 'right',
                 fade: true,
                 margin: 0,
@@ -23,22 +26,59 @@
                 track_width: 8,
                 wrapper_class: 'scrollable_wrapper'
             };
-            
-            var data = $.extend(defaults, options);
-            
-            return this.each(function(){
-                var $this = $(this);
-                                
+
+            data = $.extend(defaults, options);
+
+            return this.each(function () {
+                var $this, containerHeight, trackHeight, wrapper, container, track, thumb, container_track;
+                $this = $(this);
+
+                // Hide the scrollbar
+                function hide() {
+                    if (data.show_track) {
+                        track.fadeOut(500);
+                    }
+                    thumb.fadeOut(500);
+                }
+
+                // Function to scroll onMouseWheel
+                function onMouseWheel(event) {
+                    var e, delta, y;
+
+                    e = event.originalEvent;
+
+                    delta = (e.wheelDelta) ? -e.wheelDelta : e.detail;
+                    delta = delta / Math.abs(delta);
+
+                    y = $this.scrollTop() + (delta * data.mousewheel_step);
+                    $this.scrollTop(y);
+
+                    thumb.css({
+                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (trackHeight - thumb.height()))) + 'px'
+                    });
+
+                    // Ensure that the page is not being scrolled
+                    return false;
+                }
+
+                // Show the scrollbar
+                function show() {
+                    if (data.show_track) {
+                        track.fadeIn(150);
+                    }
+                    thumb.fadeIn(150);
+                }
+
                 // Check if this is an existing scrollable and if so destroy
                 $this.scrollable('destroy');
 
                 $this.data('scrollable', data);
 
-                var containerHeight = $this.height();
-                var trackHeight = containerHeight - (2 * data.margin);
-                
+                containerHeight = $this.height();
+                trackHeight = containerHeight - (2 * data.margin);
+
                 // Wrap the existing content
-                var wrapper = $('<div></div>')
+                wrapper = $('<div></div>')
                     .addClass(data.wrapper_class)
                     .css({
                         height: containerHeight,
@@ -46,124 +86,99 @@
                         position: 'relative',
                         width: $this.outerWidth()
                     });
-                
+
                 $this.wrap(wrapper);
-                var container = $this.parent();
-                
+                container = $this.parent();
+
                 // Create the track and thumb
-                var track = $('<div></div>')
+                track = $('<div></div>')
                     .addClass(data.track_class)
                     .css({
                         bottom: data.margin + 'px',
-                        display: (!data.fade && data.show_track)?'block':'none',
-                        left: (data.align == 'left')?data.margin + 'px':'auto',
+                        display: (!data.fade && data.show_track) ? 'block' : 'none',
+                        left: (data.align === 'left') ? data.margin + 'px' : 'auto',
                         position: 'absolute',
-                        right: (data.align == 'right')?data.margin + 'px':'auto',
+                        right: (data.align === 'right') ? data.margin + 'px' : 'auto',
                         top: data.margin + 'px',
                         width: data.track_width + 'px',
                         zIndex: 1000
                     });
-                    
-                var thumb = $('<div></div>')
+
+                thumb = $('<div></div>')
                     .addClass(data.thumb_class)
                     .css({
-                        display: (data.fade)?'none':'block',
-                        left: (data.align == 'left')?data.margin + 'px':'auto',
+                        display: (data.fade) ? 'none' : 'block',
+                        left: (data.align === 'left') ? data.margin + 'px' : 'auto',
                         position: 'absolute',
-                        right: (data.align == 'right')?data.margin + 'px':'auto',
+                        right: (data.align === 'right') ? data.margin + 'px' : 'auto',
                         top: data.margin + 'px',
                         width: data.track_width + 'px',
                         zIndex: 2000
                     });
-                    
+
                 // Store the track and thumb
                 data.track = track;
                 data.thumb = thumb;
-                    
+
                 $this.scrollable('refresh');
-                    
+
                 // Create the invisible track used for containment on the draggable
-                var container_track = track.clone()
+                container_track = track.clone()
                     .css({
                         display: 'block',
                         visibility: 'hidden',
                         zIndex: 0
                     });
-                
+
                 // Insert the track and thumb
                 container.append(container_track)
                     .append(track)
                     .append(thumb);
-                
+
                 // Make the thumb draggable and handle drag events
                 thumb.draggable({
                     axis: 'y',
                     containment: container_track,
-                    start: function(){
+                    start: function () {
                         $(this).data('dragging', true);
                     },
-                    stop: function(){
+                    stop: function () {
                         $(this).data('dragging', false);
-                        if ((container.data('hovering') !== true) && (data.fade === true)) hide();
+                        if ((container.data('hovering') !== true) && (data.fade === true)) {
+                            hide();
+                        }
                     },
-                    drag: function(){
+                    drag: function () {
                         // Calculate the Y offset required for scrolling to
                         var y = (($(this).position().top - data.margin) / (trackHeight - thumb.height())) * (data.scrollableHeight - containerHeight);
                         $this.scrollTop(y);
                     }
                 });
-                
+
                 // Handle hover
                 if (data.fade === true) {
-                    container.hover(function(){
+                    container.hover(function () {
                         container.data('hovering', true);
                         show();
-                    }, function(){
+                    }, function () {
                         container.data('hovering', false);
-                        if (thumb.data('dragging') !== true) hide();
+                        if (thumb.data('dragging') !== true) {
+                            hide();
+                        }
                     });
                 }
-                
+
                 // Handle mousewheel
                 if (data.mousewheel === true) {
                     container.on("DOMMouseScroll", onMouseWheel);
                     container.on("mousewheel", onMouseWheel);
                 }
-                
-                // Hide the scrollbar
-                function hide() {
-                    if (data.show_track) track.fadeOut(500);
-                    thumb.fadeOut(500);
-                }
-                
-                // Function to scroll onMouseWheel
-                function onMouseWheel(event) {
-                    var e = event.originalEvent;
-                    var delta = (e.wheelDelta)?-e.wheelDelta:e.detail;
-                    delta = delta / Math.abs(delta);
-                    
-                    var y = $this.scrollTop() + (delta * data.mousewheel_step);
-                    $this.scrollTop(y);
-                    
-                    thumb.css({
-                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (trackHeight - thumb.height()))) + 'px' 
-                    });
-                    
-                    // Ensure that the page is not being scrolled
-                    return false;
-                }
-                
-                // Show the scrollbar
-                function show() {
-                    if (data.show_track) track.fadeIn(150);
-                    thumb.fadeIn(150);
-                }
             });
         },
-        'destroy': function() {
-            return this.each(function(){
+        'destroy': function () {
+            return this.each(function () {
                 var $this = $(this);
-                
+
                 if ($this.data('scrollable') !== undefined) {
                     // Unbind all events
                     $(window).unbind('.scrollable');
@@ -173,8 +188,8 @@
 
                     // Clear the added CSS and remove the parent
                     $this.css({
-                        height: '', 
-                        position: '', 
+                        height: '',
+                        position: '',
                         overflow: ''
                     });
 
@@ -182,21 +197,23 @@
                 }
             });
         },
-        'refresh': function() {
-            return this.each(function(){
-                var $this = $(this);
-                var data = $this.data('scrollable');
-                
-                if (data !== undefined) {
-                    var containerHeight = $this.parent().height();
+        'refresh': function () {
+            return this.each(function () {
+                var $this, data, containerHeight, top, thumbHeight;
 
-                    var top = $this.scrollTop();
+                $this = $(this);
+                data = $this.data('scrollable');
+
+                if (data !== undefined) {
+                    containerHeight = $this.parent().height();
+
+                    top = $this.scrollTop();
 
                     // Set the overflow to visible to get the correct scrollable height
                     $this.css({
                         height: 'auto',
                         overflow: 'visible'
-                    })
+                    });
 
                     // Store the scrollable height
                     data.scrollableHeight = $this.height();
@@ -211,22 +228,24 @@
                     $this.scrollTop(top);
 
                     // Fix the thumb height
-                    var thumbHeight = containerHeight * containerHeight / data.scrollableHeight;
-                    if (thumbHeight < 16) thumbHeight = 16;
+                    thumbHeight = containerHeight * containerHeight / data.scrollableHeight;
+                    if (thumbHeight < 16) {
+                        thumbHeight = 16;
+                    }
                     data.thumb.css({
                         height: thumbHeight + 'px'
                     });
 
                     // Reposition the thumb
                     data.thumb.css({
-                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (data.track.height() - data.thumb.height()))) + 'px' 
+                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (data.track.height() - data.thumb.height()))) + 'px'
                     });
                 }
             });
         }
     };
-    
-    $.fn.scrollable = function(method) {
+
+    $.fn.scrollable = function (method) {
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {
@@ -234,5 +253,5 @@
         } else {
             $.error('Method ' + method + ' does not exist on jQuery.scrollable');
         }
-    }
-})(jQuery);
+    };
+}(jQuery));
