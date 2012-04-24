@@ -125,21 +125,27 @@
             </ul>
             
             <h3>Example 3</h3>
-            <p>Adding items dynamically.</p>
+            <p>Dynamic content within Scrollables.</p>
             
             <pre>$('#scrollable3').scrollable({margin: 6, show_track: true, fade: false});</pre>
             <p><a href="#" onclick="$('#scrollable3').scrollable({margin: 6, show_track: true, fade: false}); return false;">Make Scrollable.</a></p>
             
             <p>
                 You will need to refresh the Scrollable once the new item has 
-                been added.
+                been changed.
             </p>
             
-            <pre>function addItem() {
+            <pre>
+function addItem () {
     $('#scrollable3').append('&lt;li&gt;Item ' + ($('#scrollable3').children().length + 1) + '&lt;/li&gt;');
     $('#scrollable3').scrollable('refresh');
+}
+
+function removeItem () {
+    $('#scrollable3').children().last().remove();
+    $('#scrollable3').scrollable('refresh');
 }</pre>
-            <p><a href="#" onclick="addItem(); return false;">Add item.</a></p>
+            <p><a href="#" onclick="addItem(); return false;">Add item</a> | <a href="#" onclick="removeItem(); return false;">Remove item</a></p>
 
             <ul class="scrollable" id="scrollable3">
                 <li>Item 1</li>
@@ -173,8 +179,13 @@
         <script type="text/javascript" src="jquery-ui-1.8.18.min.js"></script>
         <script type="text/javascript" src="jquery-scrollable-1.0.1.min.js"></script>
         <script type="text/javascript">
-            function addItem() {
+            function addItem () {
                 $('#scrollable3').append('<li>Item ' + ($('#scrollable3').children().length + 1) + '</li>');
+                $('#scrollable3').scrollable('refresh');
+            }
+            
+            function removeItem () {
+                $('#scrollable3').children().last().remove();
                 $('#scrollable3').scrollable('refresh');
             }
         </script>

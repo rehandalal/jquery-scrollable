@@ -13,7 +13,7 @@
     var methods = {
         'create': function (options) {
             return this.each(function () {
-                var $this, defaults, data, containerHeight, trackHeight, wrapper, container, track, thumb, container_track;
+                var $this, defaults, data, wrapper, container, track, thumb, container_track;
 
                 defaults = {
                     align: 'right',
@@ -60,27 +60,29 @@
                     $this.scrollTop(y);
 
                     thumb.css({
-                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (trackHeight - thumb.height()))) + 'px'
+                        top: (data.margin + (($this.scrollTop() / (data._scrollableHeight - data._containerHeight)) * (track.height() - thumb.height()))) + 'px'
                     });
 
                     // Ensure that the page is only scrolled when the scrollable cannot be scrolled
-                    return (($this.scrollTop() <= 0) || ($this.scrollTop() >= data.scrollableHeight - containerHeight));
+                    return (($this.scrollTop() <= 0) || ($this.scrollTop() >= data._scrollableHeight - data._containerHeight));
                 }
 
                 // Show the scrollbar
                 function show() {
-                    if (data.show_track) {
-                        track.fadeIn(150, function () {
+                    if (data._scrollableHeight > data._containerHeight) {
+                        if (data.show_track) {
+                            track.fadeIn(150, function () {
+                                if ($.browser.msie) {
+                                    this.style.removeAttribute('filter');
+                                }
+                            });
+                        }
+                        thumb.fadeIn(150, function () {
                             if ($.browser.msie) {
                                 this.style.removeAttribute('filter');
                             }
                         });
                     }
-                    thumb.fadeIn(150, function () {
-                        if ($.browser.msie) {
-                            this.style.removeAttribute('filter');
-                        }
-                    });
                 }
 
                 // Check if this is an existing scrollable and if so destroy
@@ -88,14 +90,13 @@
 
                 $this.data('scrollable', data);
 
-                containerHeight = $this.height();
-                trackHeight = containerHeight - (2 * data.margin);
+                data._containerHeight = $this.height();
 
                 // Wrap the existing content
                 wrapper = $('<div></div>')
                     .addClass(data.wrapper_class)
                     .css({
-                        height: containerHeight,
+                        height: data._containerHeight,
                         overflow: 'hidden',
                         position: 'relative',
                         width: $this.outerWidth()
@@ -164,7 +165,7 @@
                     },
                     drag: function () {
                         // Calculate the Y offset required for scrolling to
-                        var y = (($(this).position().top - data.margin) / (trackHeight - thumb.height())) * (data.scrollableHeight - containerHeight);
+                        var y = (($(this).position().top - data.margin) / (track.height() - thumb.height())) * (data._scrollableHeight - data._containerHeight);
                         $this.scrollTop(y);
                     }
                 });
@@ -197,17 +198,23 @@
                 data = $this.data('scrollable');
 
                 if (data !== undefined) {
-                    // Clear the added CSS and remove the parent
+                    // Clear the added CSS
                     $this.css({
                         height: '',
+                        maxHeight: '',
                         position: '',
                         overflow: ''
                     });
 
-                    $this.unwrap();
+                    // Remove all of the extra elements created
+                    $this.parent().children().each(function () {
+                        if ($(this) !== $this) {
+                            $(this).remove();
+                        }
+                    });
 
-                    data._thumb.remove();
-                    data._track.remove();
+                    // Unwrap the element
+                    $this.unwrap();
 
                     // Unbind all events
                     $(window).unbind('.scrollable');
@@ -219,36 +226,42 @@
         },
         'refresh': function () {
             return this.each(function () {
-                var $this, data, containerHeight, top, thumbHeight;
+                var $this, data, top, thumbHeight;
 
                 $this = $(this);
                 data = $this.data('scrollable');
 
                 if (data !== undefined) {
-                    containerHeight = $this.parent().height();
-
                     top = $this.scrollTop();
 
                     // Set the overflow to visible to get the correct scrollable height
                     $this.css({
                         height: 'auto',
+                        maxHeight: 'none',
                         overflow: 'visible'
                     });
 
                     // Store the scrollable height
-                    data.scrollableHeight = $this.height();
+                    data._scrollableHeight = $this.height();
 
                     // Restore the overflow to hidden
                     $this.css({
-                        height: containerHeight,
+                        height: '',
+                        maxHeight: '',
                         overflow: 'hidden'
                     });
+
+                    $this.parent().css({
+                        height: $this.height()
+                    });
+
+                    data._containerHeight = $this.height();
 
                     // Reset the scroll top
                     $this.scrollTop(top);
 
                     // Fix the thumb height
-                    thumbHeight = containerHeight * containerHeight / data.scrollableHeight;
+                    thumbHeight = data._containerHeight * data._containerHeight / data._scrollableHeight;
                     if (thumbHeight < 16) {
                         thumbHeight = 16;
                     }
@@ -258,8 +271,21 @@
 
                     // Reposition the thumb
                     data._thumb.css({
-                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (data._track.height() - data._thumb.height()))) + 'px'
+                        top: (data.margin + (($this.scrollTop() / (data._scrollableHeight - data._containerHeight)) * (data._track.height() - data._thumb.height()))) + 'px'
                     });
+                    
+                    // Check if the scrollbars should be visible
+                    if (data._scrollableHeight <= data._containerHeight) {
+                        data._track.hide();
+                        data._thumb.hide();
+                    } else {
+                        if ((data.fade !== true) || ($this.parent().data('hovering') === true)) {
+                            if (data.show_track) {
+                                data._track.show();
+                            }
+                            data._thumb.show();
+                        }
+                    }
                 }
             });
         }
