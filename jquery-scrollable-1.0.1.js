@@ -34,9 +34,17 @@
                 // Hide the scrollbar
                 function hide() {
                     if (data.show_track) {
-                        track.fadeOut(500);
+                        track.fadeOut(500, function () {
+                            if ($.browser.msie) {
+                                this.style.removeAttribute('filter');
+                            }
+                        });
                     }
-                    thumb.fadeOut(500);
+                    thumb.fadeOut(500, function () {
+                        if ($.browser.msie) {
+                            this.style.removeAttribute('filter');
+                        }
+                    });
                 }
 
                 // Function to scroll onMouseWheel
@@ -62,9 +70,17 @@
                 // Show the scrollbar
                 function show() {
                     if (data.show_track) {
-                        track.fadeIn(150);
+                        track.fadeIn(150, function () {
+                            if ($.browser.msie) {
+                                this.style.removeAttribute('filter');
+                            }
+                        });
                     }
-                    thumb.fadeIn(150);
+                    thumb.fadeIn(150, function () {
+                        if ($.browser.msie) {
+                            this.style.removeAttribute('filter');
+                        }
+                    });
                 }
 
                 // Check if this is an existing scrollable and if so destroy
