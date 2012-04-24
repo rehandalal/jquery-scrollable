@@ -115,8 +115,8 @@
                     });
 
                 // Store the track and thumb
-                data.track = track;
-                data.thumb = thumb;
+                data._track = track;
+                data._thumb = thumb;
 
                 $this.scrollable('refresh');
 
@@ -190,8 +190,8 @@
 
                     $this.unwrap();
 
-                    data.thumb.remove();
-                    data.track.remove();
+                    data._thumb.remove();
+                    data._track.remove();
 
                     // Unbind all events
                     $(window).unbind('.scrollable');
@@ -236,13 +236,13 @@
                     if (thumbHeight < 16) {
                         thumbHeight = 16;
                     }
-                    data.thumb.css({
+                    data._thumb.css({
                         height: thumbHeight + 'px'
                     });
 
                     // Reposition the thumb
-                    data.thumb.css({
-                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (data.track.height() - data.thumb.height()))) + 'px'
+                    data._thumb.css({
+                        top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (data._track.height() - data._thumb.height()))) + 'px'
                     });
                 }
             });
