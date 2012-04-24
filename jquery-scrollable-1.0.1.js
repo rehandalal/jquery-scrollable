@@ -208,7 +208,7 @@
 
                     // Remove all of the extra elements created
                     $this.parent().children().each(function () {
-                        if ($(this) !== $this) {
+                        if ($(this)[0] !== $this[0]) {
                             $(this).remove();
                         }
                     });
