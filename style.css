@@ -68,6 +68,8 @@ p {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     opacity: 0.2;
+    filter: alpha(opacity=20);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
 }
 
 .scrollable_thumb {
@@ -76,6 +78,8 @@ p {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     opacity: 0.4;
+    filter: alpha(opacity=40);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
 }
 
 .blue .scrollable_track, .blue .scrollable_thumb {
