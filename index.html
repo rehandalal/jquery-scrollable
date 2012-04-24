@@ -140,7 +140,7 @@
             <p>Dynamic content within Scrollables.</p>
             
             <pre>$('#scrollable3').scrollable({margin: 6, show_track: true, fade: false});</pre>
-            <p><a href="#" onclick="$('#scrollable3').scrollable({margin: 6, show_track: true, fade: false}); return false;">Make Scrollable.</a></p>
+            <p><a href="#" onclick="$('#scrollable3').scrollable({margin: 6, show_track: true, fade: false}); return false;">Run example.</a></p>
             
             <p>
                 You will need to refresh the Scrollable once the new item has 
@@ -165,21 +165,26 @@ function removeItem () {
                 <li>Item 3</li>
                 <li>Item 4</li>
                 <li>Item 5</li>
-                <li>Item 6</li>
-                <li>Item 7</li>
-                <li>Item 8</li>
-                <li>Item 9</li>
-                <li>Item 10</li>
             </ul>
             
             <h3>Example 4</h3>
             <p>
                 You can make multiple Scrollables at once by targetting more 
-                than one element 
-                <br />(See all lists above after running the example).
+                than one element.
             </p>
-            <pre>$('.scrollable').scrollable({margin: 6, wrapper_class: 'scrollable_wrapper blue'});</pre>
-            <a href="#" onclick="$('.scrollable').scrollable({margin: 6, wrapper_class: 'scrollable_wrapper blue'}); return false;">Run example.</a>
+            <p>
+                You may also want to remove a Scrollable from one or more 
+                elements, which can be done by invoking the 'destroy' method.
+            </p>
+            <pre>
+function makeAllScrollable () {
+    $('.scrollable').scrollable({margin: 6, wrapper_class: 'scrollable_wrapper blue'});
+}
+
+function destroyAllScrollable () {
+    $('.scrollable').scrollable('destroy');
+}</pre>
+            <a href="#" onclick="makeAllScrollable(); return false;">makeAllScrollable()</a> | <a href="#" onclick="destroyAllScrollable(); return false;">destroyAllScrollable()</a>
             
             <h2>Credits &amp; License Information</h2>
             <p>This plugin was developed by <a href="http://meet-rehan.com/" target="_blank">Rehan Dalal</a>.</p>
@@ -199,6 +204,14 @@ function removeItem () {
             function removeItem () {
                 $('#scrollable3').children().last().remove();
                 $('#scrollable3').scrollable('refresh');
+            }
+            
+            function makeAllScrollable () {
+                $('.scrollable').scrollable({margin: 6, wrapper_class: 'scrollable_wrapper blue'});
+            }
+            
+            function destroyAllScrollable () {
+                $('.scrollable').scrollable('destroy');
             }
         </script>
     </body>
