@@ -18,6 +18,8 @@
                 defaults = {
                     align: 'right',
                     fade: true,
+                    fade_in_time: 150,
+                    fade_out_time: 500,
                     margin: 0,
                     mousewheel: true,
                     mousewheel_step: 32,
@@ -34,13 +36,13 @@
                 // Hide the scrollbar
                 function hide() {
                     if (data.show_track) {
-                        track.fadeOut(500, function () {
+                        track.fadeOut(data.fade_out_time, function () {
                             if ($.browser.msie) {
                                 this.style.removeAttribute('filter');
                             }
                         });
                     }
-                    thumb.fadeOut(500, function () {
+                    thumb.fadeOut(data.fade_out_time, function () {
                         if ($.browser.msie) {
                             this.style.removeAttribute('filter');
                         }
@@ -71,13 +73,13 @@
                 function show() {
                     if (data._scrollableHeight > data._containerHeight) {
                         if (data.show_track) {
-                            track.fadeIn(150, function () {
+                            track.fadeIn(data.fade_in_time, function () {
                                 if ($.browser.msie) {
                                     this.style.removeAttribute('filter');
                                 }
                             });
                         }
-                        thumb.fadeIn(150, function () {
+                        thumb.fadeIn(data.fade_in_time, function () {
                             if ($.browser.msie) {
                                 this.style.removeAttribute('filter');
                             }
