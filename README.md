@@ -18,7 +18,7 @@ First, load jQuery, jQuery UI and the plugin:
 
     <script type="text/javascript" src="jquery-1.7.2.min.js" />
     <script type="text/javascript" src="jquery-ui-1.8.18.min.js" />
-    <script type="text/javascript" src="jquery-scrollable-1.0.0.min.js" />
+    <script type="text/javascript" src="jquery-scrollable-1.0.1.min.js" />
 
 Next let's attach it to the DOM:
 

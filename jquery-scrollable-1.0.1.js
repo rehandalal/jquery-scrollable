@@ -1,7 +1,7 @@
 //
 // jQuery Scrollable Plugin 
 // http://github.com/rehandalal/jquery-scrollable
-// Version: 1.0.0
+// Version: 1.0.1
 // 
 // Create iOS / Mac OS X Lion style fading scrollbars for scrollable elements.
 // 
@@ -12,26 +12,24 @@
     "use strict";
     var methods = {
         'create': function (options) {
-            var defaults, data;
-
-            defaults = {
-                align: 'right',
-                fade: true,
-                margin: 0,
-                mousewheel: true,
-                mousewheel_step: 32,
-                show_track: false,
-                thumb_class: 'scrollable_thumb',
-                track_class: 'scrollable_track',
-                track_width: 8,
-                wrapper_class: 'scrollable_wrapper'
-            };
-
-            data = $.extend(defaults, options);
-
             return this.each(function () {
-                var $this, containerHeight, trackHeight, wrapper, container, track, thumb, container_track;
+                var $this, defaults, data, containerHeight, trackHeight, wrapper, container, track, thumb, container_track;
+
+                defaults = {
+                    align: 'right',
+                    fade: true,
+                    margin: 0,
+                    mousewheel: true,
+                    mousewheel_step: 32,
+                    show_track: false,
+                    thumb_class: 'scrollable_thumb',
+                    track_class: 'scrollable_track',
+                    track_width: 8,
+                    wrapper_class: 'scrollable_wrapper'
+                };
+
                 $this = $(this);
+                data = $.extend(defaults, options);
 
                 // Hide the scrollbar
                 function hide() {
@@ -177,9 +175,11 @@
         },
         'destroy': function () {
             return this.each(function () {
-                var $this = $(this);
-                var data = $this.data('scrollable');
-                
+                var $this, data;
+
+                $this = $(this);
+                data = $this.data('scrollable');
+
                 if (data !== undefined) {
                     // Clear the added CSS and remove the parent
                     $this.css({
@@ -189,10 +189,10 @@
                     });
 
                     $this.unwrap();
-                    
+
                     data.thumb.remove();
                     data.track.remove();
-                    
+
                     // Unbind all events
                     $(window).unbind('.scrollable');
 
