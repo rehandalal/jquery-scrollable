@@ -273,7 +273,7 @@
                     data._thumb.css({
                         top: (data.margin + (($this.scrollTop() / (data._scrollableHeight - data._containerHeight)) * (data._track.height() - data._thumb.height()))) + 'px'
                     });
-                    
+
                     // Check if the scrollbars should be visible
                     if (data._scrollableHeight <= data._containerHeight) {
                         data._track.hide();
