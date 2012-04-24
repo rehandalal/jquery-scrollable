@@ -55,8 +55,8 @@
                         top: (data.margin + (($this.scrollTop() / (data.scrollableHeight - containerHeight)) * (trackHeight - thumb.height()))) + 'px'
                     });
 
-                    // Ensure that the page is not being scrolled
-                    return false;
+                    // Ensure that the page is only scrolled when the scrollable cannot be scrolled
+                    return (($this.scrollTop() <= 0) || ($this.scrollTop() >= data.scrollableHeight - containerHeight));
                 }
 
                 // Show the scrollbar
