@@ -178,14 +178,9 @@
         'destroy': function () {
             return this.each(function () {
                 var $this = $(this);
-
-                if ($this.data('scrollable') !== undefined) {
-                    // Unbind all events
-                    $(window).unbind('.scrollable');
-
-                    // Remove data
-                    $this.removeData('scrollable');
-
+                var data = $this.data('scrollable');
+                
+                if (data !== undefined) {
                     // Clear the added CSS and remove the parent
                     $this.css({
                         height: '',
@@ -194,6 +189,15 @@
                     });
 
                     $this.unwrap();
+                    
+                    data.thumb.remove();
+                    data.track.remove();
+                    
+                    // Unbind all events
+                    $(window).unbind('.scrollable');
+
+                    // Remove data
+                    $this.removeData('scrollable');
                 }
             });
         },
